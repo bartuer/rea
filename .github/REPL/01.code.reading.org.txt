@@ -63,10 +63,10 @@
     upstream = morluto/rea.  bartuer/rea returns 404 today; no github credential on c05
     (git-credential-fleet is ADO-only; GCM non-interactive: "Cannot prompt").
 
-* Goal [1/4]
+* Goal [2/4]
   - [X] G1 rea builds and runs on an odsp box; `rea capabilities --json` lists which tools are
         available WITHOUT any bring-your-own engine.  (Phase A)
-  - [ ] G2 .github/REPL/postmortem.md exists, written per .github/REPL/postmortem, cites commits,
+  - [X] G2 .github/REPL/postmortem.md exists, written per .github/REPL/postmortem, cites commits,
         and a reader can draw rea's layer diagram from its first section alone.  (Phase B)
   - [ ] G3 .github/REPL/fix.archive/rea-prg-integration.md: how rea output enters prg
         (folder -> bin2md --corpus -> case.prg.db), with :decision:/:rejected: per choice.  (Phase C)
@@ -117,17 +117,17 @@
   - :test_tool: `jq -r '.capabilities[]|.provider.id as $p|.groups[]|[$p,.available]|@tsv' /tmp/rea01/cap.json | head` prints rows,
                 and `ls /tmp/rea01/*.json | wc -l` >= 3.
 
-* TODO Phase B -- architecture reading = write the postmortem [0/3]
+* DONE Phase B -- architecture reading = write the postmortem [3/3]
   :needs: {"tier":"wsl","island":"odsp","box":"c05"}
-  - [ ] B.1 /prg over: git log (index in /tmp/rea-idx), docs/architecture.mermaid, AGENTS.md,
+  - [X] B.1 /prg over: git log (index in /tmp/rea-idx), docs/architecture.mermaid, AGENTS.md,
         docs/tool-design.md, docs/testing.md, docs/roadmap.md, .agents/skills/**.
-  - [ ] B.2 write .github/REPL/postmortem.md per .github/REPL/postmortem: section 1 = the layer map
+  - [X] B.2 write .github/REPL/postmortem.md per .github/REPL/postmortem: section 1 = the layer map
         (entry -> composition -> application -> providers -> process -> contracts -> domain) and the one
         dominant lesson; then findings, one paragraph each, each citing >= 1 commit sha.
         Candidate lessons to verify, not assume: owned-process lifecycle (263 hits), Evidence
         observation/derivation/inference/unknown split, Python MCP -> Node rewrite, "no fallback"
         provider selection, removal pressure (102 removes, 66 breaking).
-  - [ ] B.3 frontier/kiss section: gains, losses, what got built that need not have, open questions.
+  - [X] B.3 frontier/kiss section: gains, losses, what got built that need not have, open questions.
   - :test_tool: `f=.github/REPL/postmortem.md; wc -l $f; rg -c '\b[0-9a-f]{9}\b' $f; for s in $(rg -o '\b[0-9a-f]{9}\b' $f | sort -u); do git cat-file -e $s || echo BAD $s; done`
                 -> >= 300 lines, >= 20 sha cites, no BAD.
 
