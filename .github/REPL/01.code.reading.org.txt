@@ -63,14 +63,14 @@
     upstream = morluto/rea.  bartuer/rea returns 404 today; no github credential on c05
     (git-credential-fleet is ADO-only; GCM non-interactive: "Cannot prompt").
 
-* Goal [3/4]
+* Goal [4/4]
   - [X] G1 rea builds and runs on an odsp box; `rea capabilities --json` lists which tools are
         available WITHOUT any bring-your-own engine.  (Phase A)
   - [X] G2 .github/REPL/postmortem.md exists, written per .github/REPL/postmortem, cites commits,
         and a reader can draw rea's layer diagram from its first section alone.  (Phase B)
   - [X] G3 .github/REPL/fix.archive/rea-prg-integration.md: how rea output enters prg
         (folder -> bin2md --corpus -> case.prg.db), with :decision:/:rejected: per choice.  (Phase C)
-  - [ ] G4 one binary on c05 answered end to end: `rea ... --json` -> folder -> prg ask,
+  - [X] G4 one binary on c05 answered end to end: `rea ... --json` -> folder -> prg ask,
         and /workspace/cluster/.github/skills/rea/SKILL.md points at the result.  (Phase Z)
 
 * Frontier (consequential choices, decided up front)
@@ -144,13 +144,16 @@
   - :test_tool: `rg -c ':decision:|:rejected:' .github/REPL/fix.archive/rea-prg-integration.md` >= 4.
   - :result: 14 (>=4), 106 lines (<=150), plan-02 skeleton in section 5; worker c05_01_964902 @cc129bbe6.
 
-* TODO Phase Z -- integrate/E2E: one binary question through prg [0/2]
+* DONE Phase Z -- integrate/E2E: one binary question through prg [2/2]
   :needs: {"tier":"wsl","island":"odsp","box":"c05"}
   :after: A,B,C
-  - [ ] Z.1 spike (no engine code): rea JSON for /usr/local/bin/bin2md -> projected files in DIR ->
+  - [X] Z.1 spike (no engine code): rea JSON for /usr/local/bin/bin2md -> projected files in DIR ->
         `bin2md --corpus DIR` -> `/prg ask DIR "which libraries does bin2md link and which symbols does it export?"`;
         answer checked against `objdump -p` / `nm -D`.
-  - [ ] Z.2 cluster skill /workspace/cluster/.github/skills/rea/SKILL.md: when to use, the CLI fallback,
+  - [X] Z.2 cluster skill /workspace/cluster/.github/skills/rea/SKILL.md: when to use, the CLI fallback,
         the spike recipe, link to this plan + fix.archive doc.  Commit in cluster (master).
   - :test_tool: `objdump -p /usr/local/bin/bin2md | rg NEEDED` matches the prg answer's library list,
                 and `test -s /workspace/cluster/.github/skills/rea/SKILL.md`.
+  - :result: spike/z1.check.sh /tmp/rea01/z1.ask/answer.json: bin2md [] == objdump [] (static ELF) MATCH;
+             control jq [libc.so.6 libjq.so.1 libonig.so.5] MATCH.  NEEDED came from objdump -p, not rea
+             (rea 6.7.0 has no dynamic-section op) -- plan 02 gap.  Skill: cluster fc573c00.  Worker c05_01_51bfd0 @86e3ecfee.
