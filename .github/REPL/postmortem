@@ -1,0 +1,38 @@
+refresh .github/REPL/postmortem.md.
+
+(copied from cluster/.github/REPL/postmortem, retargeted at rea. rea is a
+reading target for us: the postmortem is how we LEARN its architecture,
+not a record of our own sessions.)
+
+use /prg to search, patiently and efficiently:
+- git commit history (3700+ commits, 2026-04..10; `git log --format='%h %ad %s' --date=short`)
+- docs/ (architecture.mermaid, tool-design.md, testing.md, roadmap.md)
+- AGENTS.md, CHANGELOG.md, .agents/skills/*/SKILL.md + references/
+- src/ layout (domain -> contracts -> providers -> application -> cli/server)
+- GHCP CLI session_state of the sessions that read rea
+
+harvest only the durable lessons:
+- key design-flaw fix
+- system misunderstanding
+- critical bug fix
+- direction an experiment showed promise
+- false assumption of limitation
+
+BIG PICTURE FIRST. the postmortem is a map, not a changelog. lead with
+the architecture as it now stands and the one dominant lesson; keep each
+finding to the shortest form that still lets a reader act on it. cite the
+commit/run as evidence, do not transcribe it. if a detail does not change
+what the next person does, cut it.
+
+match the level and length of cluster commit 81a0afe (the "cut detail
+drift, keep big picture" version, ~1000 lines): full section skeleton, one
+paragraph per finding, no per-turn deep dives. adding a finding is fine;
+growing the prose is drift -- prefer replacing a superseded lesson over
+stacking a new one beside it.
+
+use /frontier and /kiss as the lens: keep both the big-picture gains and
+the losses; surface open questions and what got built that need not have.
+
+close with one section for US: what of rea plugs into prg (telemetry ->
+repo -> source -> binary folder -> case.prg.db), the way purl plugged
+search + download into prg.

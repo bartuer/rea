@@ -1,0 +1,148 @@
+; -*- mode: Org;-*-
+
+#+TITLE: 01 code.reading -- learn rea's architecture by writing its postmortem, then map rea into prg
+#+STARTUP: overview
+
+* Dev process setup
+  Before executing ANY work item in this plan, open and obey the rules in
+  this repo's instructions:
+
+    - AGENTS.md            (rea's rules: inward deps, Evidence provenance,
+                            tagged errors, owned processes, tokens > time > cpu)
+    - CONTRIBUTING.md
+
+  And, because this checkout is a fleet repo, the cluster contract:
+
+    - /workspace/cluster/.github/copilot-instructions.md  (R-MEASURE, R-ROOM,
+      R-BENCHPLACE, R-MASTER-ONLY, git discipline)
+
+  This plan does not restate either.  Where they conflict for files under
+  .github/REPL/ (rea: "never commit local planning artifacts"; cluster:
+  "commit per work item"), this plan's ruling: .github/REPL/ lives ONLY on
+  our fork's master (origin = github.com/bartuer/rea), never in a PR to
+  upstream (morluto/rea).
+
+  :ADDED_2026-10-18 (user: "/prg on commit history and skills folder, have a
+  postmortem copy in repo and /org_plan create 01.code.reading.org.txt by learn
+  architecture via postmortem writing ... we will have the capability to read
+  binary directly! ... like purl bring in search and web download to prg, but
+  first of all we need understand the rea first, use /frontier and /kiss when
+  review and audit, prepare for the next step integration, add rea to cluster
+  skills, create a room name rea, join it when plan done, /exec_plan 01 in
+  room rea, use the machine in odsp region like me"; then "we will add a remote
+  repo at github.com like dot-emacs/.git/config and push to there").
+
+* Execution environment
+  This plan runs on a multi-machine environment described in:
+
+    - ${FLEET_HOME:-$HOME/.fleet}/cluster.md
+
+  Read it before executing.  Where it defines parallelism, it outranks
+  subagent fan-out.  This plan does not restate it.
+
+* MEASURED 2026-10-18T15:20Z (c05 = CPC-bazho-42YC9, odsp island)
+  - cli header: "ASK 0 HITL 0 PERM 0 ERR 0 STALL 55 IDLE 11 DEAD 0 GONE 0|102 live/34 box".
+    No live session names rea.  Room `rea` does not exist yet (this plan creates it).
+  - rea HEAD 23f984b1a (upstream main), package rea-agents 6.7.0, 3704 commits:
+    2026-04 1 | 07 697 | 08 21 | 09 100 | 10 2885.  Authors: morluto 1899, Kaoru0822 476,
+    Ysopwnable 290, N0zoM1z0 280.  Top scopes: javascript 263 fixes, docs 143, browser 131,
+    native 115, artifacts 115, ghidra 95, process 94, setup 87.
+  - Commit themes (rg over `git log --format='%h %ad %s'`): lifecycle/cancel/cleanup/ownership 263,
+    evidence/provenance 192, remove 102, breaking `!:` 66, architecture/composition 67,
+    session 62, sqlite 10, revert 1 (283c82f68).
+  - Turning points: 1st commit "betterBinaryMCP" (Hopper-only, Python MCP);
+    fbce15f99 drops the legacy Python MCP; b0301b81d moves to Node;
+    2026-07-12 "feat: evolve REA analysis platform"; aeee5074d (#2271) offline SQLite
+    snapshot inspection with selective evidence.
+  - Skills: .agents/skills/{reverse-engineer-anything (355 lines + 6 references),
+    rea-analysis-optimization, rea-ci-tests-audit, rea-tool-design, rea-changelog-update}.
+  - c05 tools: node v24.14.0, npm 11.9.0 (rea pins npm@11.16.0), objdump, sqlite3, jq, parallel,
+    bin2md.  ABSENT: rea, ghidra, java, rizin, jadx, binwalk.  32 cpu, 62G.
+    node 24.14 < 24.15 => inspect_sqlite_database reports unsupported_version (docs/sqlite-databases.md).
+  - Remotes: origin = https://github.com/bartuer/rea.git (fetch master only, like dot-emacs);
+    upstream = morluto/rea.  bartuer/rea returns 404 today; no github credential on c05
+    (git-credential-fleet is ADO-only; GCM non-interactive: "Cannot prompt").
+
+* Goal [0/4]
+  - [ ] G1 rea builds and runs on an odsp box; `rea capabilities --json` lists which tools are
+        available WITHOUT any bring-your-own engine.  (Phase A)
+  - [ ] G2 .github/REPL/postmortem.md exists, written per .github/REPL/postmortem, cites commits,
+        and a reader can draw rea's layer diagram from its first section alone.  (Phase B)
+  - [ ] G3 .github/REPL/fix.archive/rea-prg-integration.md: how rea output enters prg
+        (folder -> bin2md --corpus -> case.prg.db), with :decision:/:rejected: per choice.  (Phase C)
+  - [ ] G4 one binary on c05 answered end to end: `rea ... --json` -> folder -> prg ask,
+        and /workspace/cluster/.github/skills/rea/SKILL.md points at the result.  (Phase Z)
+
+* Frontier (consequential choices, decided up front)
+  - :decision: read rea, do not fork its code.  Our fork carries ONLY .github/REPL/; master
+    tracks upstream main by merge.  :rejected: patching rea now -- we do not yet know what to patch.
+  - :decision: integrate through the CLI + files (rea --json > DIR), the purl shape: a producer
+    that lands files prg already reads.  :rejected: rea MCP inside prg -- prg is shell + rg + jq;
+    an MCP client is a new runtime for the same JSON.  Revisit only if Phase C measures a
+    multi-call workflow that one CLI call cannot express.
+  - :decision: no engine installs in this plan (Ghidra/IDA/JADX are BYO).  Phase A measures what
+    works with objdump + node alone.  :rejected: installing Ghidra on 34 boxes before we know a
+    question that needs it (R-ALLBOX cost).
+  - :open: node 24.14 vs rea's sqlite 24.15 floor -- a fleet node bump is a separate R-ALLBOX
+    plan; Phase A records the gap, does not fix it.
+
+* KISS audit (of this plan)
+  - 4 phases, no code beyond one SKILL.md and one spike script.  No new service, no new room
+    protocol, no new DB.  The postmortem is the architecture reading -- no separate notes doc.
+  - Cut: a per-provider tour (29 dirs).  Phase B reads the layers, not every provider.
+
+* Main Loop
+  - (R) run the phase :test_tool:, read which line failed
+  - (E) fix the doc/script, not the test
+  - (P) re-run :test_tool:
+  - (L) until it passes; then `done --ref <sha>` with the test output
+
+* TODO Phase A -- build and smoke rea on odsp [0/3]
+  :needs: {"island":"odsp"}
+  - [ ] A.1 `npm ci && npm run build:cached` in /workspace/rea (npm 11.9 vs pinned 11.16: try as is;
+        record the error if any, use `npx -y npm@11.16.0 ci` only if needed).
+  - [ ] A.2 `node scripts/rea.mjs capabilities --json > /tmp/rea01/cap.json`; tabulate
+        available vs unavailable + availability_code.
+  - [ ] A.3 smoke three engine-free reads, each saved as JSON:
+        (a) native artifact on /usr/local/bin/bin2md (objdump provider or inspect-artifact),
+        (b) a JavaScript tree (rea's own dist/ or a node_modules package) via analyze-javascript-application,
+        (c) inspect-sqlite-database on a case.prg.db (expect unsupported_version on node 24.14 -- record it).
+  - :test_tool: `jq -r '.. | objects | select(has("available")) | [.name,.available] | @tsv' /tmp/rea01/cap.json | head` prints rows,
+                and `ls /tmp/rea01/*.json | wc -l` >= 3.
+
+* TODO Phase B -- architecture reading = write the postmortem [0/3]
+  :needs: {"island":"odsp"}
+  - [ ] B.1 /prg over: git log (index in /tmp/rea-idx), docs/architecture.mermaid, AGENTS.md,
+        docs/tool-design.md, docs/testing.md, docs/roadmap.md, .agents/skills/**.
+  - [ ] B.2 write .github/REPL/postmortem.md per .github/REPL/postmortem: section 1 = the layer map
+        (entry -> composition -> application -> providers -> process -> contracts -> domain) and the one
+        dominant lesson; then findings, one paragraph each, each citing >= 1 commit sha.
+        Candidate lessons to verify, not assume: owned-process lifecycle (263 hits), Evidence
+        observation/derivation/inference/unknown split, Python MCP -> Node rewrite, "no fallback"
+        provider selection, removal pressure (102 removes, 66 breaking).
+  - [ ] B.3 frontier/kiss section: gains, losses, what got built that need not have, open questions.
+  - :test_tool: `f=.github/REPL/postmortem.md; wc -l $f; rg -c '\b[0-9a-f]{9}\b' $f; for s in $(rg -o '\b[0-9a-f]{9}\b' $f | sort -u); do git cat-file -e $s || echo BAD $s; done`
+                -> >= 300 lines, >= 20 sha cites, no BAD.
+
+* TODO Phase C -- integration design: rea into prg, the purl way [0/3]
+  :needs: {"island":"odsp"}
+  :after: A,B
+  - [ ] C.1 read purl (cluster/.github/skills/purl/SKILL.md, 106.purl.org.txt) and prg's SOURCE/TERM/TASK
+        table; write which rea Evidence fields become bin2md corpus rows (functions, strings, imports,
+        modules, unknowns) -- from Phase A JSON, not from docs.
+  - [ ] C.2 decide the producer: `rea.sh PATH [DIR]` = rea --json + jq projection into .jsonl/.md that
+        `bin2md --corpus` reads; DIR under $PURL_HOME like purl.  :decision:/:rejected: inline.
+  - [ ] C.3 write .github/REPL/fix.archive/rea-prg-integration.md (<= 150 lines) + a draft
+        plan-02 skeleton (phases only) for the build.
+  - :test_tool: `rg -c ':decision:|:rejected:' .github/REPL/fix.archive/rea-prg-integration.md` >= 4.
+
+* TODO Phase Z -- integrate/E2E: one binary question through prg [0/2]
+  :needs: {"island":"odsp"}
+  :after: A,B,C
+  - [ ] Z.1 spike (no engine code): rea JSON for /usr/local/bin/bin2md -> projected files in DIR ->
+        `bin2md --corpus DIR` -> `/prg ask DIR "which libraries does bin2md link and which symbols does it export?"`;
+        answer checked against `objdump -p` / `nm -D`.
+  - [ ] Z.2 cluster skill /workspace/cluster/.github/skills/rea/SKILL.md: when to use, the CLI fallback,
+        the spike recipe, link to this plan + fix.archive doc.  Commit in cluster (master).
+  - :test_tool: `objdump -p /usr/local/bin/bin2md | rg NEEDED` matches the prg answer's library list,
+                and `test -s /workspace/cluster/.github/skills/rea/SKILL.md`.
