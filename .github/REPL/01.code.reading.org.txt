@@ -63,12 +63,12 @@
     upstream = morluto/rea.  bartuer/rea returns 404 today; no github credential on c05
     (git-credential-fleet is ADO-only; GCM non-interactive: "Cannot prompt").
 
-* Goal [2/4]
+* Goal [3/4]
   - [X] G1 rea builds and runs on an odsp box; `rea capabilities --json` lists which tools are
         available WITHOUT any bring-your-own engine.  (Phase A)
   - [X] G2 .github/REPL/postmortem.md exists, written per .github/REPL/postmortem, cites commits,
         and a reader can draw rea's layer diagram from its first section alone.  (Phase B)
-  - [ ] G3 .github/REPL/fix.archive/rea-prg-integration.md: how rea output enters prg
+  - [X] G3 .github/REPL/fix.archive/rea-prg-integration.md: how rea output enters prg
         (folder -> bin2md --corpus -> case.prg.db), with :decision:/:rejected: per choice.  (Phase C)
   - [ ] G4 one binary on c05 answered end to end: `rea ... --json` -> folder -> prg ask,
         and /workspace/cluster/.github/skills/rea/SKILL.md points at the result.  (Phase Z)
@@ -131,17 +131,18 @@
   - :test_tool: `f=.github/REPL/postmortem.md; wc -l $f; rg -c '\b[0-9a-f]{9}\b' $f; for s in $(rg -o '\b[0-9a-f]{9}\b' $f | sort -u); do git cat-file -e $s || echo BAD $s; done`
                 -> >= 300 lines, >= 20 sha cites, no BAD.
 
-* TODO Phase C -- integration design: rea into prg, the purl way [0/3]
+* DONE Phase C -- integration design: rea into prg, the purl way [3/3]
   :needs: {"tier":"wsl","island":"odsp","box":"c05"}
   :after: A,B
-  - [ ] C.1 read purl (cluster/.github/skills/purl/SKILL.md, 106.purl.org.txt) and prg's SOURCE/TERM/TASK
+  - [X] C.1 read purl (cluster/.github/skills/purl/SKILL.md, 106.purl.org.txt) and prg's SOURCE/TERM/TASK
         table; write which rea Evidence fields become bin2md corpus rows (functions, strings, imports,
         modules, unknowns) -- from Phase A JSON, not from docs.
-  - [ ] C.2 decide the producer: `rea.sh PATH [DIR]` = rea --json + jq projection into .jsonl/.md that
+  - [X] C.2 decide the producer: `rea.sh PATH [DIR]` = rea --json + jq projection into .jsonl/.md that
         `bin2md --corpus` reads; DIR under $PURL_HOME like purl.  :decision:/:rejected: inline.
-  - [ ] C.3 write .github/REPL/fix.archive/rea-prg-integration.md (<= 150 lines) + a draft
+  - [X] C.3 write .github/REPL/fix.archive/rea-prg-integration.md (<= 150 lines) + a draft
         plan-02 skeleton (phases only) for the build.
   - :test_tool: `rg -c ':decision:|:rejected:' .github/REPL/fix.archive/rea-prg-integration.md` >= 4.
+  - :result: 14 (>=4), 106 lines (<=150), plan-02 skeleton in section 5; worker c05_01_964902 @cc129bbe6.
 
 * TODO Phase Z -- integrate/E2E: one binary question through prg [0/2]
   :needs: {"tier":"wsl","island":"odsp","box":"c05"}
