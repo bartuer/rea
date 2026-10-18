@@ -98,7 +98,7 @@
   - (L) until it passes; then `done --ref <sha>` with the test output
 
 * TODO Phase A -- build and smoke rea on odsp [0/3]
-  :needs: {"island":"odsp","box":"c05"}
+  :needs: {"tier":"wsl","island":"odsp","box":"c05"}
   - [ ] A.1 `npm ci && npm run build:cached` in /workspace/rea (npm 11.9 vs pinned 11.16: try as is;
         record the error if any, use `npx -y npm@11.16.0 ci` only if needed).
   - [ ] A.2 `node scripts/rea.mjs capabilities --json > /tmp/rea01/cap.json`; tabulate
@@ -111,7 +111,7 @@
                 and `ls /tmp/rea01/*.json | wc -l` >= 3.
 
 * TODO Phase B -- architecture reading = write the postmortem [0/3]
-  :needs: {"island":"odsp","box":"c05"}
+  :needs: {"tier":"wsl","island":"odsp","box":"c05"}
   - [ ] B.1 /prg over: git log (index in /tmp/rea-idx), docs/architecture.mermaid, AGENTS.md,
         docs/tool-design.md, docs/testing.md, docs/roadmap.md, .agents/skills/**.
   - [ ] B.2 write .github/REPL/postmortem.md per .github/REPL/postmortem: section 1 = the layer map
@@ -125,7 +125,7 @@
                 -> >= 300 lines, >= 20 sha cites, no BAD.
 
 * TODO Phase C -- integration design: rea into prg, the purl way [0/3]
-  :needs: {"island":"odsp","box":"c05"}
+  :needs: {"tier":"wsl","island":"odsp","box":"c05"}
   :after: A,B
   - [ ] C.1 read purl (cluster/.github/skills/purl/SKILL.md, 106.purl.org.txt) and prg's SOURCE/TERM/TASK
         table; write which rea Evidence fields become bin2md corpus rows (functions, strings, imports,
@@ -137,7 +137,7 @@
   - :test_tool: `rg -c ':decision:|:rejected:' .github/REPL/fix.archive/rea-prg-integration.md` >= 4.
 
 * TODO Phase Z -- integrate/E2E: one binary question through prg [0/2]
-  :needs: {"island":"odsp","box":"c05"}
+  :needs: {"tier":"wsl","island":"odsp","box":"c05"}
   :after: A,B,C
   - [ ] Z.1 spike (no engine code): rea JSON for /usr/local/bin/bin2md -> projected files in DIR ->
         `bin2md --corpus DIR` -> `/prg ask DIR "which libraries does bin2md link and which symbols does it export?"`;
