@@ -63,8 +63,8 @@
     upstream = morluto/rea.  bartuer/rea returns 404 today; no github credential on c05
     (git-credential-fleet is ADO-only; GCM non-interactive: "Cannot prompt").
 
-* Goal [0/4]
-  - [ ] G1 rea builds and runs on an odsp box; `rea capabilities --json` lists which tools are
+* Goal [1/4]
+  - [X] G1 rea builds and runs on an odsp box; `rea capabilities --json` lists which tools are
         available WITHOUT any bring-your-own engine.  (Phase A)
   - [ ] G2 .github/REPL/postmortem.md exists, written per .github/REPL/postmortem, cites commits,
         and a reader can draw rea's layer diagram from its first section alone.  (Phase B)
@@ -97,17 +97,24 @@
   - (P) re-run :test_tool:
   - (L) until it passes; then `done --ref <sha>` with the test output
 
-* TODO Phase A -- build and smoke rea on odsp [0/3]
+* DONE Phase A -- build and smoke rea on odsp [3/3]
   :needs: {"tier":"wsl","island":"odsp","box":"c05"}
-  - [ ] A.1 `npm ci && npm run build:cached` in /workspace/rea (npm 11.9 vs pinned 11.16: try as is;
+  - [X] A.1 `npm ci && npm run build:cached` in /workspace/rea (npm 11.9 vs pinned 11.16: try as is;
         record the error if any, use `npx -y npm@11.16.0 ci` only if needed).
-  - [ ] A.2 `node scripts/rea.mjs capabilities --json > /tmp/rea01/cap.json`; tabulate
+  - [X] A.2 `node scripts/rea.mjs capabilities --json > /tmp/rea01/cap.json`; tabulate
         available vs unavailable + availability_code.
-  - [ ] A.3 smoke three engine-free reads, each saved as JSON:
+  - [X] A.3 smoke three engine-free reads, each saved as JSON:
         (a) native artifact on /usr/local/bin/bin2md (objdump provider or inspect-artifact),
         (b) a JavaScript tree (rea's own dist/ or a node_modules package) via analyze-javascript-application,
         (c) inspect-sqlite-database on a case.prg.db (expect unsupported_version on node 24.14 -- record it).
-  - :test_tool: `jq -r '.. | objects | select(has("available")) | [.name,.available] | @tsv' /tmp/rea01/cap.json | head` prints rows,
+  - :result: A.1 build OK (serial npm ci then build:cached; parallel run raced on node_modules).
+        A.2 11 provider groups: TRUE rea-artifact-graph{inspect/extract_artifact, keyed_archive, dylib},
+        rea-dotnet-static{managed artifact/members/native_boundaries}; FALSE native-macos x4 unsupported_host,
+        asset_catalog unsupported_host, sqlite unsupported_version.  inspect-with-objdump works (needs positional op:
+        `rea inspect-with-objdump PATH symbols --format json`); inspect-binary-layout needs REA_PWNTOOLS_PYTHON (BYO).
+        A.3 (a) inspect-artifact bin2md 5.5KB rc=0 ~2s, objdump file_headers 2KB + symbols 667KB rc=0
+        (b) analyze-javascript-application on skills/purl 38KB rc=0 (c) sqlite capability_unavailable (node 24.14<24.15).
+  - :test_tool: `jq -r '.capabilities[]|.provider.id as $p|.groups[]|[$p,.available]|@tsv' /tmp/rea01/cap.json | head` prints rows,
                 and `ls /tmp/rea01/*.json | wc -l` >= 3.
 
 * TODO Phase B -- architecture reading = write the postmortem [0/3]
